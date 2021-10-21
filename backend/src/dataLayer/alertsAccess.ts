@@ -2,7 +2,9 @@ import * as AWS from "aws-sdk";
 import * as AWSXRay from "aws-xray-sdk";
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
 import { createLogger } from "../utils/logger";
+
 import { AlertItem } from "../models/AlertItem";
+import { AlertUpdate } from "../models/AlertUpdate";
 // import { TodoUpdate } from "../models/TodoUpdate";
 // import { ProcessCredentials } from 'aws-sdk'
 
@@ -31,6 +33,46 @@ export class AlertsAccess {
       })
       .promise();
     return alert;
+  }
+
+  async getAlerts(userId: string): Promise<AlertItem[]> {
+    logger.info("Getting alerts for user", userId);
+    const result = await this.docClient
+      .query({
+        TableName: this.alertsTable,
+        KeyConditionExpression: "userId = :userId",
+        ExpressionAttributeValues: {
+          ":userId": userId,
+        },
+      })
+      .promise();
+    return result.Items as AlertItem[];
+  }
+
+  async updateAlert(
+    userId: string,
+    alertId: string,
+    updatedAlert: AlertUpdate
+  ): Promise<AlertUpdate> {
+    logger.info("Updating alert", alertId);
+    await this.docClient
+      .update({
+        TableName: this.alertsTable,
+        Key: {
+          userId: userId,
+          alertId: alertId,
+        },
+        UpdateExpression:
+          "set cryptoId = :cryptoId, priceThreshold = :priceThreshold, errorMargin = :errorMargin, isActive = :isActive",
+        ExpressionAttributeValues: {
+          ":cryptoId": updatedAlert.cryptoId,
+          ":priceThreshold": updatedAlert.priceThreshold,
+          ":errorMargin": updatedAlert.errorMargin,
+          ":isActive": updatedAlert.isActive,
+        },
+      })
+      .promise();
+    return updatedAlert;
   }
 
   async deleteAlert(userId: string, alertId: string): Promise<void> {

@@ -1,6 +1,7 @@
 import { AlertItem } from "../models/AlertItem";
 import { AlertsAccess } from "../dataLayer/alertsAccess";
 import { CreateAlertRequest } from "../requests/CreateAlertRequest";
+import { UpdateAlertRequest } from "../requests/UpdateAlertRequest";
 // import { getUserId } from "../auth/utils";
 import { createLogger } from "../utils/logger";
 import * as uuid from "uuid";
@@ -30,6 +31,22 @@ export async function createAlert(
   await alertsAccess.createAlert(alertItem);
   logger.info("Alert was created");
   return alertItem;
+}
+
+export async function getAlertsForUser(userId: string): Promise<AlertItem[]> {
+  logger.info("Getting alerts for user", userId);
+  return await alertsAccess.getAlerts(userId);
+}
+
+// Update an alert
+export async function updateAlert(
+  userId: string,
+  alertId: string,
+  updatedAlert: UpdateAlertRequest
+): Promise<void> {
+  logger.info("Updating alert", alertId);
+  await alertsAccess.updateAlert(userId, alertId, updatedAlert);
+  logger.info("Alert was updated");
 }
 
 export async function deleteAlert(
