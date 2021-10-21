@@ -13,6 +13,7 @@ export async function createAlert(
   newAlert: CreateAlertRequest,
   userId: string
 ): Promise<AlertItem> {
+  logger.info("Creating a alert in businessLogic");
   const alertId = uuid.v4();
   const createdAt = new Date().toISOString();
   const alertItem: AlertItem = {
@@ -25,8 +26,24 @@ export async function createAlert(
     isActive: true,
   };
 
-  logger.info("Creating todo", alertItem);
-  await alertsAccess.createTodo(alertItem);
-  logger.info("Todo was created");
+  logger.info("Creating alert", alertItem);
+  await alertsAccess.createAlert(alertItem);
+  logger.info("Alert was created");
   return alertItem;
+}
+
+export async function deleteAlert(
+  userId: string,
+  alertId: string
+): Promise<boolean> {
+  try {
+    logger.info(`Deleting alert ${alertId} for user ${userId}`);
+    await alertsAccess.deleteAlert(userId, alertId);
+    logger.info(`Alert ${alertId} for user ${userId} was deleted`);
+    return true;
+  } catch (e) {
+    logger.error(`Error while deleting alert ${alertId} for user ${userId}`);
+    logger.error(e);
+  }
+  return false;
 }

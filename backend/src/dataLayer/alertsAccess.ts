@@ -15,14 +15,13 @@ if (process.env.IS_OFFLINE) {
 
 const logger = createLogger("AlertsAccess");
 
-// TODO: Implement the dataLayer logic
 export class AlertsAccess {
   constructor(
     private readonly docClient: DocumentClient = createDynamoDBClient(),
     private readonly alertsTable = process.env.ALERTS_TABLE
   ) {}
 
-  async createTodo(alert: AlertItem): Promise<AlertItem> {
+  async createAlert(alert: AlertItem): Promise<AlertItem> {
     logger.info("Table name is ", this.alertsTable);
     logger.info("Creating a new alert", alert);
     await this.docClient
@@ -32,6 +31,19 @@ export class AlertsAccess {
       })
       .promise();
     return alert;
+  }
+
+  async deleteAlert(userId: string, alertId: string): Promise<void> {
+    logger.info("Deleting alert", alertId);
+    await this.docClient
+      .delete({
+        TableName: this.alertsTable,
+        Key: {
+          userId: userId,
+          alertId: alertId,
+        },
+      })
+      .promise();
   }
 
   //   async getTodos(userId: string): Promise<TodoItem[]> {

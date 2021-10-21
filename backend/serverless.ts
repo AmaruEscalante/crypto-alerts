@@ -101,6 +101,28 @@ const serverlessConfiguration: AWS = {
         },
       ],
     },
+    deleteAlert: {
+      handler: "./src/lambda/http/deleteAlert.handler",
+      events: [
+        {
+          http: {
+            method: "delete",
+            path: "alert/{alertId}",
+            cors: true,
+          },
+        },
+      ],
+      // @ts-expect-error: Let's ignore a single compiler
+      iamRoleStatements: [
+        {
+          Effect: "Allow",
+          Action: ["dynamodb:DeleteItem"],
+          Resource: [
+            "arn:aws:dynamodb:*:*:table/${self:provider.environment.ALERTS_TABLE}",
+          ],
+        },
+      ],
+    },
   },
 
   resources: {

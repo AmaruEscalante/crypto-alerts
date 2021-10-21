@@ -14,7 +14,9 @@ export const handler = middy(
 
     const newAlert: CreateAlertRequest = JSON.parse(event.body);
     // const userId = getUserId(event);
-    const userId = uuid.v4(); // TODO: Remove, this is just for testing
+    // const userId = uuid.v4(); // TODO: Remove, this is just for testing
+    // const userId = "f814dac8-c665-4df9-8390-fce38a27ea54"; //User aws
+    const userId = "4295b180-360a-4f18-ac18-fa7c870aae89";
     const newItem = await createAlert(newAlert, userId);
 
     return {
