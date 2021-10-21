@@ -14,14 +14,23 @@ export const handler = middy(
     // const userId = getUserId(event);
     // const userId = "f814dac8-c665-4df9-8390-fce38a27ea54"; //User aws
     const userId = "4295b180-360a-4f18-ac18-fa7c870aae89"; // local user
-    await deleteAlert(userId, alertId);
+    const success = await deleteAlert(userId, alertId);
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        message: "Alert deleted successfully",
-      }),
-    };
+    if (success) {
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          message: "Alert deleted successfully",
+        }),
+      };
+    } else {
+      return {
+        statusCode: 502,
+        body: JSON.stringify({
+          message: "Something went wrong",
+        }),
+      };
+    }
   }
 );
 

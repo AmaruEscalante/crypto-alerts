@@ -1,5 +1,6 @@
 import type { AWS } from "@serverless/typescript";
 import createAlertModel from "./models/create-alert-model";
+import updateAlertModel from "./models/update-alert-model";
 // import hello from "@functions/hello";
 
 const serverlessConfiguration: AWS = {
@@ -74,6 +75,28 @@ const serverlessConfiguration: AWS = {
       handler: "./src/lambda/jobs/checkPrices.handler",
       events: [{ schedule: "rate(1 minute)" }],
     },
+    getAlerts: {
+      handler: "./src/lambda/http/getAlerts.handler",
+      events: [
+        {
+          http: {
+            method: "get",
+            path: "alert",
+            cors: true,
+          },
+        },
+      ],
+      // @ts-expect-error: Let's ignore a single compiler
+      iamRoleStatements: [
+        {
+          Effect: "Allow",
+          Action: ["dynamodb:Query"],
+          Resource: [
+            "arn:aws:dynamodb:*:*:table/${self:provider.environment.ALERTS_TABLE}",
+          ],
+        },
+      ],
+    },
     createAlert: {
       handler: "./src/lambda/http/createAlert.handler",
       events: [
@@ -95,6 +118,33 @@ const serverlessConfiguration: AWS = {
         {
           Effect: "Allow",
           Action: ["dynamodb:PutItem"],
+          Resource: [
+            "arn:aws:dynamodb:*:*:table/${self:provider.environment.ALERTS_TABLE}",
+          ],
+        },
+      ],
+    },
+    updateAlert: {
+      handler: "./src/lambda/http/updateAlert.handler",
+      events: [
+        {
+          http: {
+            method: "patch",
+            path: "alert/{alertId}",
+            cors: true,
+            request: {
+              schema: {
+                "application/json": updateAlertModel,
+              },
+            },
+          },
+        },
+      ],
+      // @ts-expect-error: Let's ignore a single compiler
+      iamRoleStatements: [
+        {
+          Effect: "Allow",
+          Action: ["dynamodb:UpdateItem"],
           Resource: [
             "arn:aws:dynamodb:*:*:table/${self:provider.environment.ALERTS_TABLE}",
           ],
