@@ -35,6 +35,39 @@ export class AlertsAccess {
     return alert;
   }
 
+  // Get all active Alerts using a scan operation and filtering only the active ones
+  async getActiveAlerts(): Promise<AlertItem[]> {
+    logger.info("Getting all active alerts");
+    const result = await this.docClient
+      .scan({
+        TableName: this.alertsTable,
+        FilterExpression: "isActive = :active",
+        ExpressionAttributeValues: {
+          ":active": true,
+        },
+      })
+      .promise();
+    return result.Items as AlertItem[];
+  }
+
+  // Get all active Alerts by cryptoId as partition key and filtering only the active ones
+  async getActiveAlertsByCryptoId(cryptoId: string): Promise<AlertItem[]> {
+    logger.info("Getting all active alerts by cryptoId");
+    const result = await this.docClient
+      .query({
+        TableName: this.alertsTable,
+        IndexName: "cryptoIdGSI-index",
+        KeyConditionExpression: "cryptoId = :cryptoId",
+        FilterExpression: "isActive = :active",
+        ExpressionAttributeValues: {
+          ":cryptoId": cryptoId,
+          ":active": true,
+        },
+      })
+      .promise();
+    return result.Items as AlertItem[];
+  }
+
   async getAlerts(userId: string): Promise<AlertItem[]> {
     logger.info("Getting alerts for user", userId);
     const result = await this.docClient
@@ -88,47 +121,6 @@ export class AlertsAccess {
       .promise();
   }
 
-  //   async getTodos(userId: string): Promise<TodoItem[]> {
-  //     const result = await this.docClient
-  //       .query({
-  //         TableName: this.todosTable,
-  //         KeyConditionExpression: "userId = :userId",
-  //         ExpressionAttributeValues: {
-  //           ":userId": userId,
-  //         },
-  //       })
-  //       .promise();
-
-  //     const items = result.Items;
-  //     return items as TodoItem[];
-  //   }
-
-  //   async updateTodo(
-  //     userId: string,
-  //     todoId: string,
-  //     updatedTodo: TodoUpdate
-  //   ): Promise<TodoUpdate> {
-  //     await this.docClient
-  //       .update({
-  //         TableName: this.todosTable,
-  //         Key: {
-  //           userId,
-  //           todoId,
-  //         },
-  //         UpdateExpression: "set #name = :name, dueDate = :dueDate, done = :done",
-  //         ExpressionAttributeValues: {
-  //           ":name": updatedTodo.name,
-  //           ":dueDate": updatedTodo.dueDate,
-  //           ":done": updatedTodo.done,
-  //         },
-  //         ExpressionAttributeNames: {
-  //           "#name": "name",
-  //         },
-  //       })
-  //       .promise();
-  //     return updatedTodo;
-  //   }
-
   //   async createTodoAttachment(
   //     userId: string,
   //     todoId: string,
@@ -144,18 +136,6 @@ export class AlertsAccess {
   //         UpdateExpression: "set attachmentUrl = :attachmentUrl",
   //         ExpressionAttributeValues: {
   //           ":attachmentUrl": attachmentUrl,
-  //         },
-  //       })
-  //       .promise();
-  //   }
-
-  //   async deleteTodo(userId: string, todoId: string): Promise<void> {
-  //     await this.docClient
-  //       .delete({
-  //         TableName: this.todosTable,
-  //         Key: {
-  //           userId,
-  //           todoId,
   //         },
   //       })
   //       .promise();

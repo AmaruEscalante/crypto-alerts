@@ -64,3 +64,15 @@ export async function deleteAlert(
   }
   return false;
 }
+
+export async function getAllActiveAlerts(): Promise<AlertItem[]> {
+  logger.info("Getting all active alerts");
+  return await alertsAccess.getActiveAlerts();
+}
+
+export async function getActiveAlertsByCryptoId(
+  cryptoId: string
+): Promise<AlertItem[]> {
+  logger.info("Getting active alerts by cryptoId", cryptoId);
+  return await alertsAccess.getActiveAlertsByCryptoId(cryptoId);
+}

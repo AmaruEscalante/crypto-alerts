@@ -194,6 +194,10 @@ const serverlessConfiguration: AWS = {
               AttributeName: "createdAt",
               AttributeType: "S",
             },
+            {
+              AttributeName: "cryptoId",
+              AttributeType: "S",
+            },
           ],
           KeySchema: [
             {
@@ -212,6 +216,25 @@ const serverlessConfiguration: AWS = {
               KeySchema: [
                 {
                   AttributeName: "userId",
+                  KeyType: "HASH",
+                },
+                {
+                  AttributeName: "createdAt",
+                  KeyType: "RANGE",
+                },
+              ],
+              Projection: {
+                ProjectionType: "ALL",
+              },
+            },
+          ],
+          // Create a Global Secondary Index to allow querying by cryptoId as partition key and isActive as sort key
+          GlobalSecondaryIndexes: [
+            {
+              IndexName: "cryptoIdGSI-index",
+              KeySchema: [
+                {
+                  AttributeName: "cryptoId",
                   KeyType: "HASH",
                 },
                 {
