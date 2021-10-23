@@ -237,6 +237,22 @@ const serverlessConfiguration: AWS = {
 
   resources: {
     Resources: {
+      GatewayResponseDefault4XX: {
+        Type: "AWS::ApiGateway::GatewayResponse",
+        Properties: {
+          ResponseType: "4XX",
+          ResponseParameters: {
+            "gatewayresponse.header.Access-Control-Allow-Origin": "'*'",
+            "gatewayresponse.header.Access-Control-Allow-Headers":
+              "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+            "gatewayresponse.header.Access-Control-Allow-Methods":
+              "'GET,OPTIONS,POST'",
+          },
+          RestApiId: {
+            Ref: "ApiGatewayRestApi",
+          },
+        },
+      },
       AlertsTable: {
         Type: "AWS::DynamoDB::Table",
         Properties: {
