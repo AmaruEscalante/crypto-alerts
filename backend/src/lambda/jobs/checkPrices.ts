@@ -126,7 +126,11 @@ async function sendAlert(alert: AlertItem) {
   };
   const response = await docClient.query(params).promise();
   console.log("Response: ", response);
-  const connectionId = response.Items[0].id;
+  const connectionId = response.Items[0]?.id;
+  if (!connectionId) {
+    console.log("No connectionId found for user: ", userId);
+    return;
+  }
   console.log("ConnectionId: ", connectionId);
   // Send the alert to the user
   const payload = {
