@@ -1,5 +1,6 @@
 # package directories
 node_modules
+node_modules/*
 jspm_packages
 .esbuild
 
@@ -11,3 +12,6 @@ jspm_packages
 
 # Local DynamoDb
 .dynamodb
+
+# env
+.env

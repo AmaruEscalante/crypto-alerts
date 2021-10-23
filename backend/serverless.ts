@@ -48,6 +48,7 @@ const serverlessConfiguration: AWS = {
       NODE_OPTIONS: "--enable-source-maps --stack-trace-limit=1000",
       // ALERTS_TABLE: `${process.env.ALERTS_TABLE}-${process.env.stage || "dev"}`,
       ALERTS_TABLE: "alerts-dev",
+      CONNECTIONS_TABLE: "connections-dev",
     },
     lambdaHashingVersion: "20201221",
     tracing: {
@@ -65,6 +66,20 @@ const serverlessConfiguration: AWS = {
             Action: ["xray:PutTelemtryRecords", "xray:PutTraceSegments"],
             Resource: "*",
           },
+          {
+            Effect: "Allow",
+            Action: [
+              "dynamodb:Scan",
+              "dynamodb:Query",
+              "dynamodb:GetItem",
+              "dynamodb:PutItem",
+              "dynamodb:DeleteItem",
+            ],
+            Resource: [
+              "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.CONNECTIONS_TABLE}",
+              "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.CONNECTIONS_TABLE}/index/*",
+            ],
+          },
         ],
       },
     },
@@ -74,6 +89,30 @@ const serverlessConfiguration: AWS = {
     checkPrices: {
       handler: "./src/lambda/jobs/checkPrices.handler",
       events: [{ schedule: "rate(1 minute)" }],
+      environment: {
+        STAGE: "${self:provider.stage}",
+        API_ID: {
+          Ref: "WebsocketsApi",
+        },
+      },
+      // @ts-expect-error: Let's ignore a single compiler
+      iamRoleStatements: [
+        {
+          Effect: "Allow",
+          Action: ["dynamodb:Query", "dynamodb:DeleteItem"],
+          Resource: [
+            "arn:aws:dynamodb:*:*:table/${self:provider.environment.ALERTS_TABLE}",
+            "arn:aws:dynamodb:*:*:table/${self:provider.environment.ALERTS_TABLE}/index/*",
+            "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.CONNECTIONS_TABLE}",
+            "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.CONNECTIONS_TABLE}/index/*",
+          ],
+        },
+        {
+          Effect: "Allow",
+          Action: ["execute-api:ManageConnections", "execute-api:Invoke"],
+          Resource: ["arn:aws:execute-api:*:*:*"],
+        },
+      ],
     },
     getAlerts: {
       handler: "./src/lambda/http/getAlerts.handler",
@@ -173,6 +212,27 @@ const serverlessConfiguration: AWS = {
         },
       ],
     },
+    // Websocket handling
+    ConnectHandler: {
+      handler: "./src/lambda/websocket/connect.handler",
+      events: [
+        {
+          websocket: {
+            route: "$connect",
+          },
+        },
+      ],
+    },
+    DisconnectHandler: {
+      handler: "./src/lambda/websocket/disconnect.handler",
+      events: [
+        {
+          websocket: {
+            route: "$disconnect",
+          },
+        },
+      ],
+    },
   },
 
   resources: {
@@ -239,6 +299,52 @@ const serverlessConfiguration: AWS = {
                 },
                 {
                   AttributeName: "createdAt",
+                  KeyType: "RANGE",
+                },
+              ],
+              Projection: {
+                ProjectionType: "ALL",
+              },
+            },
+          ],
+        },
+      },
+
+      WebSocketConnectionsDynamoDBTable: {
+        Type: "AWS::DynamoDB::Table",
+        Properties: {
+          TableName: "${self:provider.environment.CONNECTIONS_TABLE}",
+          AttributeDefinitions: [
+            {
+              AttributeName: "id",
+              AttributeType: "S",
+            },
+            {
+              AttributeName: "userId",
+              AttributeType: "S",
+            },
+          ],
+          KeySchema: [
+            {
+              AttributeName: "id",
+              KeyType: "HASH",
+            },
+            {
+              AttributeName: "userId",
+              KeyType: "RANGE",
+            },
+          ],
+          BillingMode: "PAY_PER_REQUEST",
+          GlobalSecondaryIndexes: [
+            {
+              IndexName: "userIdGSI-index",
+              KeySchema: [
+                {
+                  AttributeName: "userId",
+                  KeyType: "HASH",
+                },
+                {
+                  AttributeName: "id",
                   KeyType: "RANGE",
                 },
               ],

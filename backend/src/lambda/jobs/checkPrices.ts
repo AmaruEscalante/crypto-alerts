@@ -1,8 +1,32 @@
 // Lambda function that checks the prices of cryptocurrency using coingecko API
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import * as AWS from "aws-sdk";
+import * as AWSXRay from "aws-xray-sdk";
+
 import CoinGecko from "coingecko-api";
+
 import { getActiveAlertsByCryptoId } from "../../businessLogic/alerts";
 import { AlertItem } from "../../models/AlertItem";
+
+let XAWS = null;
+if (process.env.IS_OFFLINE) {
+  XAWS = AWS;
+} else {
+  XAWS = AWSXRay.captureAWS(AWS);
+}
+
+// Env vars
+const connectionsTable = process.env.CONNECTIONS_TABLE;
+const stage = process.env.STAGE;
+const apiId = process.env.API_ID;
+
+const connectionParams = {
+  apiVersion: "2018-11-29",
+  endpoint: `${apiId}.execute-api.us-east-1.amazonaws.com/${stage}`,
+};
+
+const apiGateway = new AWS.ApiGatewayManagementApi(connectionParams);
+const docClient = new XAWS.DynamoDB.DocumentClient();
 
 export const handler = async (
   event: APIGatewayProxyEvent
@@ -25,7 +49,10 @@ export const handler = async (
   console.log("Current prices", prices);
   console.log("Crypto Alerts", cryptoAlerts);
   // For each crypto, check if the current price is greater than the alert price and if so, send an alert
-  cryptoAlerts.forEach((alert: AlertItem) => {
+  cryptoAlerts.forEach((alert) => {
+    if (alert.length === 0) {
+      return;
+    }
     alert = alert[0];
     const crypto = alert.cryptoId;
     const alertPrice = alert.priceThreshold;
@@ -85,6 +112,54 @@ async function getCryptoCurrentPrices(
 }
 
 async function sendAlert(alert: AlertItem) {
-  // Send an alert to the user
   console.log("Sending alert to user: ", alert.userId);
+  // Send an alert to the user
+  const userId = alert.userId;
+  // Get the connectionId of the user from connections table using the GSI on userId
+  const params = {
+    TableName: connectionsTable,
+    IndexName: "userIdGSI-index",
+    KeyConditionExpression: "userId = :userId",
+    ExpressionAttributeValues: {
+      ":userId": userId,
+    },
+  };
+  const response = await docClient.query(params).promise();
+  console.log("Response: ", response);
+  const connectionId = response.Items[0].id;
+  console.log("ConnectionId: ", connectionId);
+  // Send the alert to the user
+  const payload = {
+    type: "PRICE_ALERT",
+    price: alert.priceThreshold,
+    cryptoId: alert.cryptoId,
+  };
+  await sendMessageToClient(connectionId, userId, payload);
+}
+
+async function sendMessageToClient(connectionId, userId, payload) {
+  try {
+    console.log("Sending message to connection", connectionId);
+
+    await apiGateway
+      .postToConnection({
+        ConnectionId: connectionId,
+        Data: JSON.stringify(payload),
+      })
+      .promise();
+  } catch (e) {
+    console.log("Failed to send message", JSON.stringify(e));
+    if (e.statusCode === 410) {
+      console.log("Stale connection");
+      // Delete stale connection with connectionId and userId
+      const params = {
+        TableName: connectionsTable,
+        Key: {
+          id: connectionId,
+          userId: userId,
+        },
+      };
+      await docClient.delete(params).promise();
+    }
+  }
 }
