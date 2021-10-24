@@ -42,6 +42,20 @@ const serverlessConfiguration: AWS = {
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
+      request: {
+        schemas: {
+          "alert-create-model": {
+            name: "AlertCreateModel",
+            schema: createAlertModel,
+            description: "Create alert model",
+          },
+          "alert-update-model": {
+            name: "AlertUpdateModel",
+            schema: updateAlertModel,
+            description: "Update alert model",
+          },
+        },
+      },
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
@@ -86,6 +100,10 @@ const serverlessConfiguration: AWS = {
   },
   // import the function via paths
   functions: {
+    Auth: {
+      handler: "./src/lambda/auth/auth0Authorizer.handler",
+    },
+
     checkPrices: {
       handler: "./src/lambda/jobs/checkPrices.handler",
       events: [{ schedule: "rate(1 minute)" }],
@@ -240,7 +258,7 @@ const serverlessConfiguration: AWS = {
       GatewayResponseDefault4XX: {
         Type: "AWS::ApiGateway::GatewayResponse",
         Properties: {
-          ResponseType: "4XX",
+          ResponseType: "DEFAULT_4XX",
           ResponseParameters: {
             "gatewayresponse.header.Access-Control-Allow-Origin": "'*'",
             "gatewayresponse.header.Access-Control-Allow-Headers":
