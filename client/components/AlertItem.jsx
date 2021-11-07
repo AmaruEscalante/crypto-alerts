@@ -11,9 +11,9 @@ const AlertItem = ({
           src="https://assets.coingecko.com/coins/images/1/small/bitcoin.png?1547033579"
           alt={cryptoId}
         />
-        <h2 className="ml-5">{cryptoId}</h2>
+        <h2 className="ml-5 hidden md:inline-grid">{cryptoId}</h2>
       </div>
-      <div className="text-[#F79825]">64 500</div>
+      <div className="text-[#F79825] hidden md:inline-grid">64 500</div>
       <div>{priceThreshold}</div>
       <h3>+/- {errorMargin}% ()</h3>
       <div className={`bg-gray-500 w-20 py-1 rounded-md text-center`}>
