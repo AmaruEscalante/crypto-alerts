@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .trade {
+    @apply text-gray-400 hover:scale-110 cursor-pointer
+        transition-all duration-150 ease-out ml-3 mr-3;
+  }
+
+  .input {
+    @apply bg-[#131517] text-white text-xl block w-full pl-10 border-gray-700 rounded-md focus:ring-gray-100 focus:border-gray-100;
+  }
+}
