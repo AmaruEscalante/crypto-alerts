@@ -4,7 +4,7 @@ import Feed from "../components/Feed";
 
 export default function Home() {
   return (
-    <div className="bg-[#1E1F23]" h-screen overflow-y-scroll>
+    <div className="bg-secondary" h-screen overflow-y-scroll>
       <Head>
         <title>The Crypto Way</title>
         <link rel="icon" href="/favicon.ico" />

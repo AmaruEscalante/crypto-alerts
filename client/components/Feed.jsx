@@ -1,4 +1,5 @@
 import AlertCard from "./AlertCard";
+import AlertsList from "./AlertsList";
 
 const Feed = () => {
   return (
@@ -6,8 +7,8 @@ const Feed = () => {
       {/* Card */}
       <section className="col-span-4">
         <AlertCard />
+        <AlertsList />
       </section>
-      {/* Alert List */}
     </main>
   );
 };

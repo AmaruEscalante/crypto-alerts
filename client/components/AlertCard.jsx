@@ -18,7 +18,7 @@ const AlertCard = () => {
   };
 
   return (
-    <div className="flex-1 bg-[#131517] rounded-3xl m-10">
+    <div className="flex-1 bg-primary rounded-3xl m-10">
       <div className="flex items-center justify-center pt-3">
         <button
           onClick={handleBuyOrSell}

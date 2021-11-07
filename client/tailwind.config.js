@@ -9,7 +9,17 @@ module.exports = {
       sans: ["VT323", ...defaultTheme.fontFamily.sans],
       logo: ["Iceberg"],
     },
-    extend: {},
+    // extend: {},
+    extend: {
+      colors: {
+        primary: {
+          DEFAULT: "#131517",
+        },
+        secondary: {
+          DEFAULT: "#1E1F23",
+        },
+      },
+    },
   },
   variants: {
     extend: {},

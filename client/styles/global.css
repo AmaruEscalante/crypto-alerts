@@ -9,6 +9,6 @@
   }
 
   .input {
-    @apply bg-[#131517] text-white text-xl block w-full pl-10 border-gray-700 rounded-md focus:ring-gray-100 focus:border-gray-100;
+    @apply bg-primary text-white text-xl block w-full pl-10 border-gray-700 rounded-md focus:ring-gray-100 focus:border-gray-100;
   }
 }
