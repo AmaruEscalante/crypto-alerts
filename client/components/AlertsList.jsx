@@ -1,5 +1,6 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import AlertItem from "./AlertItem";
+import { getAlerts } from "../pages/api/alerts-api";
 
 const activeAlerts = [
   {
@@ -41,12 +42,28 @@ const activeAlerts = [
 ];
 
 const AlertsList = () => {
+  const [alerts, setAlerts] = useState([]);
+
+  const fetchAlerts = async () => {
+    try {
+      const response = await getAlerts("adasd");
+      setAlerts(response);
+      console.log(response);
+    } catch (e) {
+      console.log(`Fetching data failed with error ${e}`);
+    }
+  };
+
+  useEffect(() => {
+    fetchAlerts();
+  }, []);
+
   return (
     <div className="bg-primary m-10 rounded-2xl px-0 pt-5">
       <div className="text-white text-3xl mb-5 px-10">Active Alerts</div>
       <div>
-        {activeAlerts.map((alert) => (
-          <AlertItem key={alert.id} alertInfo={alert} />
+        {alerts.map((item) => (
+          <AlertItem key={item.alertId} alertInfo={item} />
         ))}
       </div>
     </div>
