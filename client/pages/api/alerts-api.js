@@ -18,3 +18,31 @@ export const getAlerts = async (idToken) => {
   console.log("Alerts fetched are:", response.data);
   return response.data.items;
 };
+
+export const createAlert = async (idToken, newAlert) => {
+  const response = await Axios.post(
+    `${apiEndpoint}/alert`,
+    JSON.stringify(newAlert),
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${idToken}`,
+      },
+    }
+  );
+  return response.data.item;
+};
+
+export const patchAlert = async (idToken, alertId, updatedAlert) => {
+  const response = await Axios.patch(
+    `${apiEndpoint}/alert/${alertId}`,
+    JSON.stringify(updatedAlert),
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${idToken}`,
+      },
+    }
+  );
+  return response.data.item;
+};

@@ -1,10 +1,12 @@
 import { useState } from "react";
 import SearchIcon from "pixelarticons/svg/search.svg";
+import { createAlert } from "../pages/api/alerts-api";
 
 const AlertCard = () => {
   const [buyOrSell, setBuyOrSell] = useState(0);
-  const [crypto, setCrypto] = useState("");
-  const [price, setPrice] = useState("");
+  const [cryptoId, setCryptoId] = useState("");
+  const [priceThreshold, setPriceThreshold] = useState("");
+  const [errorMargin, setErrorMargin] = useState("");
   const [error, setError] = useState("");
 
   const handleBuyOrSell = (e) => {
@@ -14,6 +16,35 @@ const AlertCard = () => {
     } else if (e.target.innerText === "Sell") {
       console.log("Sell selected");
       setBuyOrSell(2);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (buyOrSell === 0) {
+      setError("Please select a buy or sell option");
+    } else if (cryptoId === "") {
+      setError("Please enter a crypto currency");
+    } else if (priceThreshold === "") {
+      setError("Please enter a price");
+    } else if (errorMargin === "") {
+      setError("Please enter an error margin");
+    } else {
+      setError("");
+      const newAlert = {
+        // buyOrSell,
+        cryptoId,
+        priceThreshold: parseFloat(priceThreshold),
+        errorMargin: parseFloat(errorMargin),
+      };
+      console.log(`New Alert ${JSON.stringify(newAlert)}`);
+      try {
+        const response = await createAlert("adsfasdf", newAlert);
+        console.log(response);
+      } catch (e) {
+        console.log(`Error in alert creation ${e}`);
+      } finally {
+        console.log(`Finished createAlert call`);
+      }
     }
   };
 
@@ -44,22 +75,45 @@ const AlertCard = () => {
             <div className="absolute pl-3 inset-y-0 flex items-center">
               <SearchIcon className="w-5 h-5 text-gray-500" />
             </div>
-            <input className="input" type="text" placeholder="Crypto" />
+            <input
+              onChange={(e) => setCryptoId(e.target.value)}
+              className="input"
+              type="text"
+              placeholder="Crypto"
+            />
           </div>
           <div className="relative mt-2">
             <input
               className="input"
               type="text"
+              onChange={(e) => setPriceThreshold(e.target.value)}
               placeholder="Price threshold"
             />
           </div>
           <div className="relative mt-2">
-            <input className="input" type="text" placeholder="Error margin %" />
+            <input
+              onChange={(e) => setErrorMargin(e.target.value)}
+              className="input"
+              type="text"
+              placeholder="Error margin %"
+            />
+          </div>
+          <div className="relative mt-4">
+            {error === "" ? (
+              <></>
+            ) : (
+              <h3 className="absolute text-red-600 text-xl inset-y-[-10px]">
+                {error}
+              </h3>
+            )}
           </div>
         </div>
       </div>
       <div className="flex relative justify-center mt-5 h-10 text-black">
-        <button className="bg-[#21C9B8] hover:text-white block w-full rounded-b-2xl  text-2xl">
+        <button
+          onClick={handleSubmit}
+          className="bg-[#21C9B8] hover:text-white block w-full rounded-b-2xl  text-2xl"
+        >
           Create
         </button>
       </div>
