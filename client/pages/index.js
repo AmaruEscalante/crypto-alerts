@@ -9,11 +9,11 @@ export default function Home() {
 
   console.log(`User is : ${user}`);
 
-  if (isLoading) return <div>Loading...</div>;
+  // if (isLoading) return <div>Loading...</div>;
   if (error) return <div>{error.message}</div>;
 
   return (
-    <div className="bg-secondary" h-screen overflow-y-scroll>
+    <div className="bg-secondary h-screen overflow-y-scroll">
       <Head>
         <title>The Crypto Bay - TCB</title>
         <link rel="icon" href="/favicon.ico" />

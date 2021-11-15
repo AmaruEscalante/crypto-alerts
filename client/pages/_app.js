@@ -2,9 +2,6 @@ import "../styles/global.css";
 import { Auth0Provider } from "@auth0/auth0-react";
 
 function MyApp({ Component, pageProps }) {
-  console.log();
-  console.log();
-  console.log();
   return (
     <Auth0Provider
       domain={process.env.AUTH0_DOMAIN}
