@@ -162,6 +162,7 @@ const serverlessConfiguration: AWS = {
             method: "post",
             path: "alert",
             cors: true,
+            authorizer: "Auth",
             request: {
               schema: {
                 "application/json": createAlertModel,

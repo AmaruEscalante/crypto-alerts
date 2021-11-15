@@ -21,7 +21,7 @@ const jwksUrl = "https://dev-1la8x365.us.auth0.com/.well-known/jwks.json";
 export const handler = async (
   event: APIGatewayTokenAuthorizerEvent
 ): Promise<APIGatewayAuthorizerResult> => {
-  logger.info("Authorizing a user", event.authorizationToken);
+  logger.info("Authorizing a user", event);
   try {
     const jwtToken = await verifyToken(event.authorizationToken);
     logger.info("User was authorized", jwtToken);
@@ -59,9 +59,12 @@ export const handler = async (
 };
 
 async function verifyToken(authHeader: string): Promise<JwtPayload> {
+  logger.info(`verifyToken receives ${authHeader}`);
   const token = getToken(authHeader);
   const jwt: Jwt = decode(token, { complete: true }) as Jwt; // Decode from base64 to JSON
 
+  logger.info(`Bearer token is ${token}`, { token });
+  logger.info(`Decoded JWT is ${jwt}`, { jwt });
   // Get the certificate
   const secret = await getCertificate(jwksUrl, jwt.header.kid);
   const cert = `-----BEGIN CERTIFICATE-----\n${secret}\n-----END CERTIFICATE-----`;
@@ -89,6 +92,6 @@ function getToken(authHeader: string): string {
 
   const split = authHeader.split(" ");
   const token = split[1];
-
+  logger.info(`getToken returns ${token}`);
   return token;
 }
