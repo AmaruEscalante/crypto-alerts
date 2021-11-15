@@ -1,6 +1,9 @@
 import Image from "next/image";
+import { useAuth0 } from "@auth0/auth0-react";
 
-const Header = (user) => {
+const Header = () => {
+  const { user, loginWithRedirect, logout } = useAuth0();
+
   return (
     <div className="bg-[#131517] sticky top-0 z-50">
       <div className="flex justify-between items-center max-w-6xl mx-5 xl:mx-auto">
@@ -30,22 +33,22 @@ const Header = (user) => {
           {/* <div></div> */}
           {console.log("USER is", user)}
           {/* {console.log(user.user)} */}
-          {user?.user?.name !== undefined ? (
+          {user?.name !== undefined ? (
             <div className="text-white text-xl">
-              Welcome {user.user.given_name}!
-              <a
+              Welcome {user.given_name}!
+              <button
                 className="ml-5 bg-red-900 p-3 rounded-md hover:bg-red-500"
-                href="/api/auth/logout"
+                onClick={logout}
               >
                 Logout
-              </a>
+              </button>
             </div>
           ) : (
             // Welcome {user.name}! <a href="/api/auth/logout">Logout</a>
             // <h3 className="text-white text-xl"></h3>
-            <a className="text-white text-xl" href="/api/auth/login">
+            <button onClick={loginWithRedirect} className="text-white text-xl">
               Login
-            </a>
+            </button>
           )}
           {/* Notifications */}
         </div>

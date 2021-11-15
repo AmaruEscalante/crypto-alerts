@@ -1,8 +1,10 @@
 import { useState } from "react";
 import SearchIcon from "pixelarticons/svg/search.svg";
 import { createAlert } from "../pages/api/alerts-api";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const AlertCard = () => {
+  const { getAccessTokenSilently } = useAuth0();
   const [buyOrSell, setBuyOrSell] = useState(0);
   const [cryptoId, setCryptoId] = useState("");
   const [priceThreshold, setPriceThreshold] = useState("");
@@ -38,7 +40,8 @@ const AlertCard = () => {
       };
       console.log(`New Alert ${JSON.stringify(newAlert)}`);
       try {
-        const response = await createAlert("adsfasdf", newAlert);
+        const tokenId = await getAccessTokenSilently({ scope: "openid" });
+        const response = await createAlert(tokenId, newAlert);
         console.log(response);
       } catch (e) {
         console.log(`Error in alert creation ${e}`);
