@@ -1,18 +1,29 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import Head from "next/head";
 import Header from "../components/Header";
 import Feed from "../components/Feed";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useAuthStore } from "../modules/auth/useAuthStore";
+import { useNotificationsStore } from "../modules/auth/useNotificationsStore";
+import { wssEndpoint } from "./api/alerts-api";
+import useWebSocket, { ReadyState } from "react-use-websocket";
 
 export default function Home() {
   const { isLoading, isAuthenticated, error, user, getIdTokenClaims } =
     useAuth0();
   const setUser = useAuthStore((st) => st.setUser);
+  const setNotification = useNotificationsStore((st) => st.setNotification);
   const setTokenId = useAuthStore((st) => st.setTokenId);
+  const [socketUrl, setSocketUrl] = useState(wssEndpoint);
+  const [messageHistory, setMessageHistory] = useState([]);
+  const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
 
-  // if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>{error.message}</div>;
+  useEffect(() => {
+    if (lastMessage !== null) {
+      setNotification(lastMessage);
+      setMessageHistory((prev) => prev.concat(lastMessage));
+    }
+  }, [lastMessage, setMessageHistory]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -22,6 +33,9 @@ export default function Home() {
       });
     }
   }, [user]);
+
+  // if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>{error.message}</div>;
 
   return (
     <div className="bg-secondary h-screen overflow-y-scroll">
@@ -40,6 +54,11 @@ export default function Home() {
       {/* Header */}
       <Header />
       <Feed />
+      <ul>
+        {messageHistory.map((message, idx) => (
+          <span key={idx}>{message ? message.data : null}</span>
+        ))}
+      </ul>
     </div>
   );
 }

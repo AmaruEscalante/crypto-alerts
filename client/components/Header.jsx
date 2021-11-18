@@ -1,8 +1,11 @@
 import Image from "next/image";
 import { useAuth0 } from "@auth0/auth0-react";
+import NotificationIcon from "pixelarticons/svg/notification.svg";
+import { useNotificationsStore } from "../modules/auth/useNotificationsStore";
 
 const Header = () => {
   const { user, loginWithRedirect, logout } = useAuth0();
+  const notifications = useNotificationsStore((st) => st.notifications);
 
   return (
     <div className="bg-[#131517] sticky top-0 z-50">
@@ -13,8 +16,8 @@ const Header = () => {
             quality="100"
             src="/logo4x.png"
             alt="logo"
-            height="40"
-            width="40"
+            height="50"
+            width="50"
           />
           <h1 className="hidden font-logo text-yellow-300 text-xl ml-2 lg:inline-grid cursor-pointer">
             THE CRYPTO BAY
@@ -34,10 +37,21 @@ const Header = () => {
           {console.log("USER is", user)}
           {/* {console.log(user.user)} */}
           {user?.name !== undefined ? (
-            <div className="text-white text-xl">
-              Welcome {user.given_name}!
+            <div className="flex items-center">
+              <div className="hidden text-white text-2xl lg:inline-grid">
+                Welcome {user.given_name}!
+              </div>
+              <div className="relative">
+                <NotificationIcon className="w-10 h-10 text-white ml-5 cursor-pointer" />
+                <div
+                  className="absolute -top-1 -right-2 text-xs w-5 h-5
+            bg-red-500 rounded-full flex items-center justify-center animate-pulse text-white text-lg"
+                >
+                  {notifications.length}
+                </div>
+              </div>
               <button
-                className="ml-5 bg-red-900 p-3 rounded-md hover:bg-red-500"
+                className="hidden ml-5 text-white text-xl bg-red-900 p-3 rounded-md lg:inline-grid hover:bg-red-500"
                 onClick={logout}
               >
                 Logout

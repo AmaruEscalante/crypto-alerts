@@ -6,7 +6,9 @@ export default function helloAPI(req, res) {
 }
 
 const apiId = "tj78nqd7o5";
+const wssId = "54mwefi7ba";
 export const apiEndpoint = `https://${apiId}.execute-api.us-east-1.amazonaws.com/dev`;
+export const wssEndpoint = `wss://${wssId}.execute-api.us-east-1.amazonaws.com/dev`;
 
 export const getAlerts = async (idToken) => {
   const response = await Axios.get(`${apiEndpoint}/alert`, {
