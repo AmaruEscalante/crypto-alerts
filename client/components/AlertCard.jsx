@@ -2,9 +2,10 @@ import { useState } from "react";
 import SearchIcon from "pixelarticons/svg/search.svg";
 import { createAlert } from "../pages/api/alerts-api";
 import { useAuth0 } from "@auth0/auth0-react";
+import { useAuthStore } from "../modules/auth/useAuthStore";
 
 const AlertCard = () => {
-  const { getIdTokenClaims, getAccessTokenSilently } = useAuth0();
+  const tokenId = useAuthStore((st) => st.tokenId);
   const [buyOrSell, setBuyOrSell] = useState(0);
   const [cryptoId, setCryptoId] = useState("");
   const [priceThreshold, setPriceThreshold] = useState("");
@@ -40,12 +41,7 @@ const AlertCard = () => {
       };
       console.log(`New Alert ${JSON.stringify(newAlert)}`);
       try {
-        const accessToken = await getAccessTokenSilently({ scope: "openid" });
-        const claims = await getIdTokenClaims();
-        console.log(`Access token is ${accessToken}`);
-        console.log(`Claims is ${JSON.stringify(claims)}`);
-        console.log(`Raw ${claims.__raw}`);
-        const response = await createAlert(claims.__raw, newAlert);
+        const response = await createAlert(tokenId, newAlert);
         console.log(response);
       } catch (e) {
         console.log(`Error in alert creation ${e}`);
