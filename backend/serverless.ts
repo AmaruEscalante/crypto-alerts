@@ -139,6 +139,7 @@ const serverlessConfiguration: AWS = {
           http: {
             method: "get",
             path: "alert",
+            authorizer: "Auth",
             cors: true,
           },
         },
