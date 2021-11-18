@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import AlertItem from "./AlertItem";
 import { getAlerts } from "../pages/api/alerts-api";
+import { useAuthStore } from "../modules/auth/useAuthStore";
 
 const activeAlerts = [
   {
@@ -42,11 +43,12 @@ const activeAlerts = [
 ];
 
 const AlertsList = () => {
+  const tokenId = useAuthStore((st) => st.tokenId);
   const [alerts, setAlerts] = useState([]);
 
   const fetchAlerts = async () => {
     try {
-      const response = await getAlerts("adasd");
+      const response = await getAlerts(tokenId);
       setAlerts(response);
       console.log(response);
     } catch (e) {
