@@ -57,8 +57,10 @@ const AlertsList = () => {
   };
 
   useEffect(() => {
-    fetchAlerts();
-  }, []);
+    if (tokenId) {
+      fetchAlerts();
+    }
+  }, [tokenId]);
 
   return (
     <div className="bg-primary m-10 rounded-2xl px-0 pt-5">
