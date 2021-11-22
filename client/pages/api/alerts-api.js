@@ -48,3 +48,13 @@ export const patchAlert = async (idToken, alertId, updatedAlert) => {
   );
   return response.data.item;
 };
+
+export const deleteAlert = async (idToken, alertId) => {
+  const response = await Axios.delete(`${apiEndpoint}/alert/${alertId}`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${idToken}`,
+    },
+  });
+  return response.data.item;
+};
