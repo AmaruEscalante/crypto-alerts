@@ -35,10 +35,6 @@ const Header = () => {
           />
         </div>
         <div className="flex ml-5">
-          {/* User */}
-          {/* <div></div> */}
-          {console.log("USER is", user)}
-          {/* {console.log(user.user)} */}
           {user?.name !== undefined ? (
             <div className="flex items-center">
               <div className="hidden text-white text-2xl lg:inline-grid">

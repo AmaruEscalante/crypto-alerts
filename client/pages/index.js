@@ -25,6 +25,11 @@ export default function Home() {
       Authorization: `Bearer ${tokenId}`,
     },
     retryOnError: true,
+    onError: (e) => {
+      console.log(`Error connecting to wss ${JSON.stringify(e)}`);
+    },
+    reconnectAttempts: 10,
+    reconnectInterval: 2000,
   });
 
   useEffect(() => {
@@ -63,11 +68,12 @@ export default function Home() {
       {/* Header */}
       <Header />
       <Feed />
-      <ul>
+      {/* <ul>
+        {readyState}
         {messageHistory.map((message, idx) => (
           <span key={idx}>{message ? message.data : null}</span>
         ))}
-      </ul>
+      </ul> */}
     </div>
   );
 }
