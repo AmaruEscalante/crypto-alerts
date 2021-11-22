@@ -14,9 +14,18 @@ export default function Home() {
   const setUser = useAuthStore((st) => st.setUser);
   const setNotification = useNotificationsStore((st) => st.setNotification);
   const setTokenId = useAuthStore((st) => st.setTokenId);
+  const tokenId = useAuthStore((st) => st.tokenId);
   const [socketUrl, setSocketUrl] = useState(wssEndpoint);
   const [messageHistory, setMessageHistory] = useState([]);
-  const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
+
+  // if (tokenId !== "") {
+  // console.log(`Connecting to WSS with tokenId ${tokenId}`);
+  const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
+    queryParams: {
+      Authorization: `Bearer ${tokenId}`,
+    },
+    retryOnError: true,
+  });
 
   useEffect(() => {
     if (lastMessage !== null) {
