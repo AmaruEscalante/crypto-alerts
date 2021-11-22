@@ -5,12 +5,14 @@ import { cors } from "middy/middlewares";
 import { CreateAlertRequest } from "../../requests/CreateAlertRequest";
 import { getUserId } from "../utils";
 import { createAlert } from "../../businessLogic/alerts";
+import { createLogger } from "../../utils/logger";
 
 // import * as uuid from "uuid";
+const logger = createLogger("createAlert");
 
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    console.log("Processing event: ", event);
+    logger.info("Processing createAlert event", event);
 
     const newAlert: CreateAlertRequest = JSON.parse(event.body);
     const userId = getUserId(event);
