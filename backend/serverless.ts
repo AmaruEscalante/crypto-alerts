@@ -190,6 +190,7 @@ const serverlessConfiguration: AWS = {
           http: {
             method: "patch",
             path: "alert/{alertId}",
+            authorizer: "Auth",
             cors: true,
             request: {
               schema: {
@@ -218,6 +219,7 @@ const serverlessConfiguration: AWS = {
             method: "delete",
             path: "alert/{alertId}",
             cors: true,
+            authorizer: "Auth",
           },
         },
       ],
