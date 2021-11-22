@@ -49,22 +49,24 @@ export const handler = async (
   console.log("Current prices", prices);
   console.log("Crypto Alerts", cryptoAlerts);
   // For each crypto, check if the current price is greater than the alert price and if so, send an alert
-  cryptoAlerts.forEach((alert) => {
-    if (alert.length === 0) {
+  cryptoAlerts.forEach((alerts: AlertItem[]) => {
+    if (alerts.length === 0) {
       return;
     }
-    alert = alert[0];
-    const crypto = alert.cryptoId;
-    const alertPrice = alert.priceThreshold;
-    const currentPrice = prices.find(
-      (price) => price.cryptoId === crypto
-    ).price;
-    if (currentPrice > alertPrice) {
-      console.log(
-        `Current price of ${crypto} is greater than the alert price of ${alertPrice}`
-      );
-      sendAlert(alert);
-    }
+    alerts.forEach((alert: AlertItem) => {
+      const crypto = alert.cryptoId;
+      const alertPrice = alert.priceThreshold;
+      const currentPrice = prices.find(
+        (price) => price.cryptoId === crypto
+      ).price;
+      if (currentPrice > alertPrice) {
+        console.log(
+          `Current price of ${crypto} is greater than the alert price of ${alertPrice}`
+        );
+        console.log(`${alert.userId}`);
+        sendAlert(alert);
+      }
+    });
   });
 
   return {
