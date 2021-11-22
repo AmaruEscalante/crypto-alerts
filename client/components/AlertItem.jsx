@@ -1,7 +1,8 @@
-import React from "react";
+import EditIcon from "pixelarticons/svg/edit-box.svg";
+import Link from "next/link";
 
 const AlertItem = ({
-  alertInfo: { cryptoId, priceThreshold, errorMargin },
+  alertInfo: { cryptoId, priceThreshold, errorMargin, alertId },
 }) => {
   return (
     <div className="flex justify-between items-center bg-primary py-5 border-t border-secondary px-10 text-white text-xl">
@@ -20,6 +21,20 @@ const AlertItem = ({
         {/* {buyOrSell.toUpperCase()} */}
         {"BUY"}
       </div>
+      {/* <div className="text-white text-lg">{alertId}</div> */}
+      <Link
+        href={{
+          pathname: `/alert/${alertId}`,
+          query: {
+            cryptoId,
+            priceThreshold,
+            errorMargin,
+            alertId,
+          },
+        }}
+      >
+        <EditIcon className="w-5 h-5 text-gray-500 cursor-pointer hover:text-white" />
+      </Link>
     </div>
   );
 };
