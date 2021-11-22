@@ -6,7 +6,7 @@ import {
 import "source-map-support/register";
 import * as AWS from "aws-sdk";
 import * as AWSXRay from "aws-xray-sdk";
-// import { getUserId } from "../utils";
+import { getUserIdWss } from "../utils";
 import { createLogger } from "../../utils/logger";
 
 let XAWS = null;
@@ -26,8 +26,9 @@ export const handler: APIGatewayProxyHandler = async (
 ): Promise<APIGatewayProxyResult> => {
   logger.info("Incoming websocket event", event);
   // Get current user id
-  const userId = "4295b180-360a-4f18-ac18-fa7c870aae89"; // TODO: Get user id from event
-  // const userId = getUserId(event);
+
+  // const userId = "4295b180-360a-4f18-ac18-fa7c870aae89"; // TODO: Get user id from event
+  const userId = getUserIdWss(event);
 
   const connectionId = event.requestContext.connectionId;
   const timestamp = new Date().toISOString();
