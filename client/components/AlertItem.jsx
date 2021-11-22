@@ -2,7 +2,7 @@ import EditIcon from "pixelarticons/svg/edit-box.svg";
 import Link from "next/link";
 
 const AlertItem = ({
-  alertInfo: { cryptoId, priceThreshold, errorMargin, alertId },
+  alertInfo: { cryptoId, priceThreshold, errorMargin, alertId, isActive },
 }) => {
   return (
     <div className="flex justify-between items-center bg-primary py-5 border-t border-secondary px-10 text-white text-xl">
@@ -17,7 +17,11 @@ const AlertItem = ({
       <div className="text-[#F79825] hidden md:inline-grid">64 500</div>
       <div>{priceThreshold}</div>
       <h3>+/- {errorMargin}% ()</h3>
-      <div className={`bg-gray-500 w-20 py-1 rounded-md text-center`}>
+      <div
+        className={` w-20 py-1 rounded-md text-center ${
+          isActive ? "bg-green-500" : "bg-gray-500"
+        }`}
+      >
         {/* {buyOrSell.toUpperCase()} */}
         {"BUY"}
       </div>
