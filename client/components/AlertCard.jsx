@@ -1,16 +1,16 @@
 import { useState } from "react";
 import SearchIcon from "pixelarticons/svg/search.svg";
 import { createAlert } from "../pages/api/alerts-api";
-import { useAuth0 } from "@auth0/auth0-react";
 import { useAuthStore } from "../modules/auth/useAuthStore";
 
 const AlertCard = () => {
   const tokenId = useAuthStore((st) => st.tokenId);
+  // Form data
+  const [error, setError] = useState("");
   const [buyOrSell, setBuyOrSell] = useState(0);
   const [cryptoId, setCryptoId] = useState("");
   const [priceThreshold, setPriceThreshold] = useState("");
   const [errorMargin, setErrorMargin] = useState("");
-  const [error, setError] = useState("");
 
   const handleBuyOrSell = (e) => {
     if (e.target.innerText === "Buy") {
