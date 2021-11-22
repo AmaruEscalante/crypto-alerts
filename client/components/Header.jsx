@@ -2,6 +2,7 @@ import Image from "next/image";
 import { useAuth0 } from "@auth0/auth0-react";
 import NotificationIcon from "pixelarticons/svg/notification.svg";
 import { useNotificationsStore } from "../modules/auth/useNotificationsStore";
+import Link from "next/link";
 
 const Header = () => {
   const { user, loginWithRedirect, logout } = useAuth0();
@@ -12,13 +13,15 @@ const Header = () => {
       <div className="flex justify-between items-center max-w-6xl mx-5 xl:mx-auto">
         {/* Logo */}
         <div className="flex items-center m-3 cursor-pointer">
-          <Image
-            quality="100"
-            src="/logo4x.png"
-            alt="logo"
-            height="50"
-            width="50"
-          />
+          <Link href="/">
+            <Image
+              quality="100"
+              src="/logo4x.png"
+              alt="logo"
+              height="50"
+              width="50"
+            />
+          </Link>
           <h1 className="hidden font-logo text-yellow-300 text-xl ml-2 lg:inline-grid cursor-pointer">
             THE CRYPTO BAY
           </h1>
