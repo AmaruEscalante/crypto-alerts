@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import SearchIcon from "pixelarticons/svg/search.svg";
-import { createAlert } from "../pages/api/alerts-api";
+import { deleteAlert, patchAlert, createAlert } from "../pages/api/alerts-api";
 import { useAuthStore } from "../modules/auth/useAuthStore";
+import Router from "next/router";
 
 const EditAlertCard = ({
   alertInfo: { cryptoId, priceThreshold, errorMargin, alertId },
@@ -10,9 +11,18 @@ const EditAlertCard = ({
   // Form data
   const [error, setError] = useState("");
   const [buyOrSell, setBuyOrSell] = useState(0);
-  const [cryptoId, setCryptoId] = useState(cryptoId);
-  const [priceThreshold, setPriceThreshold] = useState(priceThreshold);
-  const [errorMargin, setErrorMargin] = useState(errorMargin);
+  const [vcryptoId, setCryptoId] = useState("");
+  const [vpriceThreshold, setPriceThreshold] = useState("");
+  const [verrorMargin, setErrorMargin] = useState("");
+
+  useEffect(() => {
+    // Load props to state variables in component
+    setCryptoId(cryptoId);
+    setPriceThreshold(priceThreshold);
+    setErrorMargin(errorMargin);
+
+    return () => {};
+  }, []);
 
   const handleBuyOrSell = (e) => {
     if (e.target.innerText === "Buy") {
@@ -24,32 +34,46 @@ const EditAlertCard = ({
     }
   };
 
-  const handleSubmit = async () => {
+  const handlePatch = useCallback(async () => {
     if (buyOrSell === 0) {
       setError("Please select a buy or sell option");
-    } else if (cryptoId === "") {
-      setError("Please enter a crypto currency");
-    } else if (priceThreshold === "") {
+    } else if (vcryptoId === "") {
+      setError("Please enter a crypto ID");
+    } else if (vpriceThreshold === "") {
       setError("Please enter a price");
-    } else if (errorMargin === "") {
+    } else if (verrorMargin === "") {
       setError("Please enter an error margin");
     } else {
       setError("");
-      const newAlert = {
+      const updateAlert = {
         // buyOrSell,
-        cryptoId,
-        priceThreshold: parseFloat(priceThreshold),
-        errorMargin: parseFloat(errorMargin),
+        cryptoId: vcryptoId,
+        priceThreshold: parseFloat(vpriceThreshold),
+        errorMargin: parseFloat(verrorMargin),
+        isActive: true,
       };
-      console.log(`New Alert ${JSON.stringify(newAlert)}`);
+      console.log(`Update Alert is ${JSON.stringify(updateAlert)}`);
       try {
-        const response = await createAlert(tokenId, newAlert);
+        const response = await patchAlert(tokenId, alertId, updateAlert);
         console.log(response);
       } catch (e) {
-        console.log(`Error in alert creation ${e}`);
+        console.log(`Error in alert update ${e}`);
       } finally {
-        console.log(`Finished createAlert call`);
+        Router.push("/");
       }
+    }
+  }, [vcryptoId, vpriceThreshold, verrorMargin, buyOrSell]);
+
+  const handleDelete = async () => {
+    console.log(`Deleting alert ${alertId}`);
+    try {
+      const response = await deleteAlert(tokenId, alertId);
+      console.log(response);
+    } catch (e) {
+      console.log(`Error in alert deletion ${e}`);
+    } finally {
+      console.log(`Finished deleteAlert call`);
+      Router.push("/");
     }
   };
 
@@ -108,13 +132,13 @@ const EditAlertCard = ({
       </div>
       <div className="flex relative justify-center mt-5 h-10 text-black">
         <button
-          onClick={handleSubmit}
+          onClick={handlePatch}
           className="bg-[#21C9B8] hover:text-white block rounded-2xl  text-2xl mx-5 px-5 "
         >
           Update
         </button>
         <button
-          onClick={handleSubmit}
+          onClick={handleDelete}
           className="hover:text-white block rounded-2xl  text-2xl bg-red-600 mx-5 px-5 "
         >
           Delete
